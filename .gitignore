@@ -1,0 +1,12 @@
+# Ignore XAMPP files
+/xampp/
+/htdocs/
+
+# Ignore environment and configuration files
+db.php
+.env
+config.php
+
+# Ignore system files
+.DS_Store
+Thumbs.db

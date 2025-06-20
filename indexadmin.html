@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Al Hoceima Province | Employee Portal</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="description" content="Employee portal for Al Hoceima Province administration" />
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet" />
+<!-- Font Awesome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+<!-- Leaflet CSS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" />
+<style>
+:root {
+    --bg-color: #f5f7fa;
+    --text-color: #333;
+    --card-color: #fff;
+    --primary-color: #2575fc;
+    --secondary-color: #6a11cb;
+    --accent-color: #ff6a00;
+    --gradient: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
+    --header-height: 70px;
+    --border-radius: 8px;
+    --box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+body.dark-mode {
+    --bg-color: #121212;
+    --text-color: #f0f0f0;
+    --card-color: #1e1e1e;
+    --primary-color: #4a90e2;
+    --secondary-color: #8a2be2;
+    --box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+body {
+    font-family: 'Poppins', sans-serif;
+    background: var(--bg-color);
+    color: var(--text-color);
+    transition: background 0.4s, color 0.4s;
+    line-height: 1.6;
+    min-height: 100vh;
+}
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+header {
+    background: var(--card-color);
+    box-shadow: var(--box-shadow);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: var(--header-height);
+    padding: 0 20px;
+}
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 700;
+    font-size: 1.2rem;
+    background: var(--gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+.logo img {
+    height: 30px;
+}
+.btn-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--gradient);
+    color: white;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: transform 0.3s;
+}
+.btn-icon:hover {
+    transform: scale(1.1);
+}
+.main-content {
+    padding: 40px 0 150px;
+    min-height: calc(100vh - var(--header-height));
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+}
+.welcome-section {
+    text-align: center;
+    margin-bottom: 40px;
+}
+.welcome-section h1 {
+    font-size: 2rem;
+    margin-bottom: 10px;
+    background: var(--gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    display: inline-block;
+}
+.welcome-section p {
+    color: var(--text-color);
+    opacity: 0.8;
+    max-width: 600px;
+    margin: 0 auto;
+}
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 30px;
+    margin-bottom: 60px;
+    width: 100%;
+}
+.dashboard-card {
+    background: var(--card-color);
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    padding: 25px;
+    transition: transform 0.3s, box-shadow 0.3s;
+    border: 1px solid rgba(0,0,0,0.05);
+}
+.dashboard-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+}
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+.card-header h2 {
+    font-size: 1.3rem;
+    color: var(--primary-color);
+}
+.card-icon {
+    width: 50px;
+    height: 50px;
+    background: var(--gradient);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.5rem;
+}
+.btn {
+    display: inline-block;
+    padding: 10px 25px;
+    background: var(--gradient);
+    color: white;
+    border-radius: 30px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s;
+    border: none;
+    cursor: pointer;
+    font-size: 0.9rem;
+}
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+}
+.map-container {
+    height: 300px;
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    position: relative;
+}
+#provinceMap {
+    height: 100%;
+    width: 100%;
+}
+.quick-actions {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 15px;
+}
+.quick-action {
+    background: var(--card-color);
+    border-radius: var(--border-radius);
+    padding: 15px;
+    text-align: center;
+    cursor: pointer;
+    transition: transform 0.3s;
+    text-decoration: none;
+    color: var(--text-color);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+.quick-action:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+.quick-action i {
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+    color: var(--primary-color);
+}
+.quick-action div {
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+.interactive-widget {
+    background: var(--card-color);
+    padding: 20px 0;
+    box-shadow: 0 -4px 12px rgba(0,0,0,0.05);
+    text-align: center;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    z-index: 99;
+}
+.widget-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+.weather-time {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 30px;
+    margin-bottom: 20px;
+}
+.time-display {
+    text-align: center;
+}
+#current-time {
+    font-size: 2rem;
+    font-weight: 700;
+    background: var(--gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+#current-date {
+    font-size: 0.9rem;
+    opacity: 0.8;
+}
+.weather-animation {
+    position: relative;
+    width: 80px;
+    height: 80px;
+}
+.sun {
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    background: #FFD700;
+    border-radius: 50%;
+    box-shadow: 0 0 20px #FFD700;
+    top: 5px;
+    left: 20px;
+    animation: pulse 3s infinite alternate;
+}
+.cloud {
+    position: absolute;
+    width: 50px;
+    height: 20px;
+    background: #FFF;
+    border-radius: 20px;
+    top: 30px;
+    left: 5px;
+    animation: move 10s linear infinite;
+}
+.cloud:before, .cloud:after {
+    content: '';
+    position: absolute;
+    background: #FFF;
+    border-radius: 50%;
+}
+.cloud:before {
+    width: 20px;
+    height: 20px;
+    top: -10px;
+    left: 10px;
+}
+.cloud:after {
+    width: 15px;
+    height: 15px;
+    top: -8px;
+    right: 10px;
+}
+.fun-fact {
+    font-size: 0.8rem;
+    padding: 8px;
+    background: rgba(106, 17, 203, 0.1);
+    border-radius: var(--border-radius);
+    max-width: 600px;
+    margin: 0 auto;
+}
+@keyframes pulse {
+    0% { transform: scale(1); }
+    100% { transform: scale(1.1); }
+}
+@keyframes move {
+    0% { transform: translateX(0); opacity: 1; }
+    50% { transform: translateX(30px); opacity: 0.8; }
+    100% { transform: translateX(0); opacity: 1; }
+}
+/* Responsive styles omitted for brevity, but you can include similar media queries as needed */
+</style>
+</head>
+<body>
+<header>
+<div class="header-content container">
+    <div class="logo">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/Flag_of_Morocco.svg/1200px-Flag_of_Morocco.svg.png" alt="Morocco Flag" />
+        <span>Al Hoceima Employee Portal</span>
+    </div>
+    <div style="display:flex; align-items:center;">
+        <button class="btn-icon" id="modeToggle"><i class="fas fa-moon"></i></button>
+    </div>
+</div>
+</header>
+
+<main class="main-content">
+<div class="container">
+    <div class="welcome-section">
+        <h1>Employee Dashboard</h1>
+        <p>Welcome to the Al Hoceima Province administration portal. Here's your daily overview.</p>
+    </div>
+    <div class="dashboard-grid">
+        <!-- Province Map Card -->
+        <div class="dashboard-card">
+            <div class="card-header">
+                <h2><i class="fas fa-map-marked-alt"></i> Province Map</h2>
+            </div>
+            <div class="map-container">
+                <div id="provinceMap"></div>
+            </div>
+            <p style="margin-top:15px; font-size:0.9rem;">Interactive map of Al Hoceima Province with administrative boundaries.</p>
+        </div>
+        <!-- Quick Actions Card -->
+        <div class="dashboard-card">
+            <div class="card-header">
+                <h2><i class="fas fa-bolt"></i> Quick Actions</h2>
+            </div>
+            <div class="quick-actions">
+                <a href="divisions.php" class="quick-action">
+                    <i class="fas fa-sitemap"></i>
+                    <div>Division</div>
+                </a>
+                <a href="destinataires.php" class="quick-action">
+                    <i class="fas fa-address-book"></i>
+                    <div>Destinataire</div>
+                </a>
+                <a href="villes.php" class="quick-action">
+                    <i class="fas fa-city"></i>
+                    <div>Villes</div>
+                </a>
+                <a href="organizations.php" class="quick-action">
+                    <i class="fas fa-building"></i>
+                    <div>Organizations</div>
+                </a>
+                                <a href="signataire.php" class="quick-action">
+                    <i class="fas fa-building"></i>
+                    <div>Signataire province</div>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+</main>
+
+<div class="interactive-widget">
+<div class="widget-container">
+    <div class="weather-time">
+        <div class="time-display">
+            <div id="current-time"></div>
+            <div id="current-date"></div>
+        </div>
+        <div class="weather-animation">
+            <div class="sun"></div>
+            <div class="cloud"></div>
+        </div>
+    </div>
+    <div class="fun-fact">
+        <p id="morocco-fact">Did you know? Al Hoceima is known for its beautiful beaches and Rif Mountains.</p>
+    </div>
+</div>
+</div>
+
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
+<script>
+  // Initialize dark mode toggle
+  document.addEventListener('DOMContentLoaded', function() {
+    initDarkMode();
+    initMap();
+    initTimeAndFacts();
+  });
+
+  function initDarkMode() {
+    const modeToggle = document.getElementById('modeToggle');
+    const savedMode = localStorage.getItem('alhoceima_darkMode');
+    if (savedMode === 'enabled') {
+      document.body.classList.add('dark-mode');
+      const icon = modeToggle.querySelector('i');
+      icon.classList.contains('fa-moon') && icon.classList.replace('fa-moon', 'fa-sun');
+    } else {
+      const icon = modeToggle.querySelector('i');
+      icon.classList.contains('fa-sun') && icon.classList.replace('fa-sun', 'fa-moon');
+    }
+    modeToggle.addEventListener('click', () => {
+      document.body.classList.toggle('dark-mode');
+      const icon = modeToggle.querySelector('i');
+      if (document.body.classList.contains('dark-mode')) {
+        icon.classList.replace('fa-moon', 'fa-sun');
+        localStorage.setItem('alhoceima_darkMode', 'enabled');
+      } else {
+        icon.classList.replace('fa-sun', 'fa-moon');
+        localStorage.setItem('alhoceima_darkMode', 'disabled');
+      }
+    });
+  }
+
+  function initMap() {
+    const map = L.map('provinceMap').setView([35.2483, -3.9300], 11);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+    // Markers
+    L.marker([35.2483, -3.9300]).addTo(map).bindPopup("<b>Provincial Administration</b><br>Main government building");
+    L.marker([35.2550, -3.9350]).addTo(map).bindPopup("<b>Regional Hospital</b><br>Medical facility");
+    L.marker([35.2400, -3.9200]).addTo(map).bindPopup("<b>Al Hoceima Port</b><br>Commercial shipping");
+    // Boundary polygon
+    L.polygon([
+      [35.26, -3.95],
+      [35.26, -3.90],
+      [35.23, -3.90],
+      [35.23, -3.95]
+    ], {color: '#2575fc', fillOpacity: 0.1}).addTo(map);
+  }
+
+  function initTimeAndFacts() {
+    const facts = [
+      "Al Hoceima is part of the Rif region, known for its Berber culture.",
+      "The Al Hoceima National Park is a biodiversity hotspot.",
+      "The city was rebuilt after a major earthquake in 2004.",
+      "Al Hoceima's beaches are among the most beautiful in Morocco.",
+      "The local cuisine features seafood and traditional Berber dishes."
+    ];
+    function updateTime() {
+      const now = new Date();
+      document.getElementById('current-time').textContent = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', second:'2-digit'});
+      document.getElementById('current-date').textContent = now.toLocaleDateString('en-US', {weekday:'long', year:'numeric', month:'long', day:'numeric'});
+    }
+    function showFact() {
+      const fact = facts[Math.floor(Math.random() * facts.length)];
+      document.getElementById('morocco-fact').textContent = 'Did you know? ' + fact;
+    }
+    updateTime();
+    setInterval(updateTime, 1000);
+    showFact();
+    setInterval(showFact, 10000);
+  }
+</script>
+</body>
+</html>
